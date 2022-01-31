@@ -15,7 +15,7 @@ app.listen(3000, () => {
   console.log("listening to port 3000");
 });
 
-const moviesData = require("./data.json");
+const moviesData = require("./Movie-Data/data.json");
 
 app.get("/", homePageHandler);
 
