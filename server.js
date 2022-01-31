@@ -49,14 +49,14 @@ app.get("*", pageNotFoundHandler);
 const pageNotFoundHandler = (req, res) => {
   return res.status(404).send({
     status: 404,
-    responseText: "page not found error",
+    responseText: "page not found",
   });
 };
 
 const errorHandler = (err, req, res) => {
   res.send({
     status: 500,
-    responseText: "Sorry, something went wrong",
+    responseText: "Something went wrong",
   });
 };
 
