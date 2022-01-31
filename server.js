@@ -96,9 +96,10 @@ let searchPageHandler = (req, res) => {
   let searchQuery = req.query.search;
   console.log(req.query.search);
   let searchResults = [];
+
   axios
     .get(
-      `https://api.themoviedb.org/3/trending/all/week?api_key=${APIKEY}&language=en-US&query=${searchQuery}`
+      `https://api.themoviedb.org/3/search/movie?api_key=${APIKEY}&language=en-US&query=${searchQuery}`
     )
     .then((value) => {
       value.data.results.forEach((movie) => {
@@ -108,14 +109,6 @@ let searchPageHandler = (req, res) => {
           movie.overview
         );
         searchResults.push(movie);
-
-        // value.data((movie) => {
-        //   // movie = new MoviesLibrary(
-        //   //   movie.title,
-        //   //   movie.poster_path,
-        //   //   movie.overview
-        //   // );
-        //   searchResults.push(movie);
       });
       return res.status(200).json(searchResults);
     });
