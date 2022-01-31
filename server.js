@@ -21,7 +21,7 @@ const errorHandler = (err, req, res) => {
 
 app.use(errorHandler);
 
-app.get("/", moviesLibraryHandler);
+app.get("/", homePageHandler);
 
 app.listen(3000, () => {
   console.log("listening to port 3000");
