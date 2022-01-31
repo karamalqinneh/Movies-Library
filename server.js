@@ -3,12 +3,6 @@ const express = require("express");
 const app = express();
 const errorHandler = require("errorHandler");
 
-// app.listen(3000, () => console.log("test"));
-// app.get('/hello', helloWorldHandler)
-// const helloWorldHandler = (req, res) => {
-//   res.status(200).send("hello World");
-// };
-
 app.get("*", pageNotFoundHandler);
 
 const pageNotFoundHandler = (req, res) => {
