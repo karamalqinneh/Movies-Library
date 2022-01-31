@@ -9,6 +9,24 @@ const errorHandler = require("errorHandler");
 //   res.status(200).send("hello World");
 // };
 
+app.get("*", pageNotFoundHandler);
+
+const pageNotFoundHandler = (req, res) => {
+  return res.status(404).send({
+    status: 404,
+    responseText: "page not found",
+  });
+};
+
+const errorHandler = (err, req, res) => {
+  res.send({
+    status: 500,
+    responseText: "Something went wrong",
+  });
+};
+
+app.use(errorHandler);
+
 app.get("/", moviesLibraryHandler);
 
 app.listen(3000, () => {
@@ -43,21 +61,3 @@ app.get("/favorite", favoritePageHandler);
 const favoritePageHandler = (req, res) => {
   return res.status(200).send("To be filled...");
 };
-
-app.get("*", pageNotFoundHandler);
-
-const pageNotFoundHandler = (req, res) => {
-  return res.status(404).send({
-    status: 404,
-    responseText: "page not found",
-  });
-};
-
-const errorHandler = (err, req, res) => {
-  res.send({
-    status: 500,
-    responseText: "Something went wrong",
-  });
-};
-
-app.use(errorHandler);
