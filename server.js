@@ -1,9 +1,35 @@
 const express = require("express");
 
 const app = express();
-const errorHandler = require("errorHandler");
 
-app.get("*", pageNotFoundHandler);
+function MoviesLibrary(title, poster_path, overview) {
+  this.title = title;
+  this.poster_path = poster_path;
+  this.overview = overview;
+}
+
+app.listen(3000, () => {
+  console.log("listening to port 3000");
+});
+
+const moviesData = require("./Movie-Data/data.json");
+
+let homePageHandler = (req, res) => {
+  let moviesLibray = [];
+  moviesData.data.forEach((movie) => {
+    movie = new MoviesLibrary(movie.title, movie.poster_path, movie.overview);
+    moviesLibray.push(movie);
+  });
+  return res.status(200).json(moviesLibray);
+};
+
+app.get("/", homePageHandler);
+
+let favoritePageHandler = (req, res) => {
+  return res.status(200).send("To be filled...");
+};
+
+app.get("/favorite", favoritePageHandler);
 
 const pageNotFoundHandler = (req, res) => {
   return res.status(404).send({
@@ -11,6 +37,8 @@ const pageNotFoundHandler = (req, res) => {
     responseText: "page not found",
   });
 };
+
+app.get("*", pageNotFoundHandler);
 
 const errorHandler = (err, req, res) => {
   res.send({
@@ -20,38 +48,3 @@ const errorHandler = (err, req, res) => {
 };
 
 app.use(errorHandler);
-
-app.get("/", homePageHandler);
-
-app.listen(3000, () => {
-  console.log("listening to port 3000");
-});
-
-const moviesData = require("./Movie-Data/data.json");
-
-app.get("/", homePageHandler);
-
-function MoviesLibrary(title, poster_path, overview) {
-  this.title = title;
-  this.poster_path = poster_path;
-  this.overview = overview;
-}
-
-const homePageHandler = (req, res) => {
-  let moviesLibray = [];
-  moviesData.data.forEach((movie) => {
-    let movie = new MoviesLibrary(
-      movie.title,
-      movie.poster_path,
-      movie.overview
-    );
-    moviesLibray.push(movie);
-  });
-  return res.status(200).json(moviesLibray);
-};
-
-app.get("/favorite", favoritePageHandler);
-
-const favoritePageHandler = (req, res) => {
-  return res.status(200).send("To be filled...");
-};
