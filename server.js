@@ -3,7 +3,13 @@ const axios = require("axios");
 const dotenv = require("dotenv");
 const app = express();
 const moviesData = require("./Movie-Data/data.json");
+const pg = require("pg");
+const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json();
 dotenv.config();
+const DATABASE_URL = process.env.DATABASE_URL;
+const client = new pg.Client(DATABASE_URL);
+app.use(express.json());
 const APIKEY = process.env.APIKEY;
 
 function MoviesLibrary(title, poster_path, overview) {
@@ -116,6 +122,28 @@ let searchPageHandler = (req, res) => {
 
 app.get("/search", searchPageHandler);
 
+const addMovieHandler = (req, res) => {
+  let movie = req.body;
+  let sql = `INSERT INTO movies(title, poster_path,overview,comment) VALUES($1, $2, $3, $4); RETURN *`;
+  let values = [movie.id, movie.poster_path, movie.overview, movie.comment];
+
+  client.query(sql, values).then((data) => {
+    console.log(data);
+    return res.status(201).json(data.rows);
+  });
+};
+
+app.post("/addMovie", jsonParser, addMovieHandler);
+
+const getMoviesHandler = (req, res) => {
+  let sql = "SELECT * FROM movies";
+  client.query(sql).then(() => {
+    res.status(200).json(data.row);
+  });
+};
+
+app.get("/getMovies", getMoviesHandler);
+
 const pageNotFoundHandler = (req, res) => {
   return res.status(404).send({
     status: 404,
@@ -125,14 +153,17 @@ const pageNotFoundHandler = (req, res) => {
 
 app.get("*", pageNotFoundHandler);
 
-const errorHandler = (err, req, res) => {
-  res.send({
-    status: 500,
-    responseText: "Something went wrong",
-  });
-};
+// const errorHandler = (err, req, res) => {
+//   res.send({
+//     status: 500,
+//     responseText: "Something went wrong",
+//   });
+// };
 
-app.use(errorHandler);
-app.listen(3000, () => {
-  console.log("listening to port 3000");
+// app.use(errorHandler);
+
+client.connect().then(() => {
+  app.listen(3030, () => {
+    console.log("listening to port 3030");
+  });
 });
