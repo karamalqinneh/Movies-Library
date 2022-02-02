@@ -1,18 +1,21 @@
-// testing the push
-
+// dependencies
 const express = require("express");
 const axios = require("axios");
 const dotenv = require("dotenv");
 const app = express();
 const moviesData = require("./Movie-Data/data.json");
 const pg = require("pg");
-const bodyParser = require("body-parser");
-const jsonParser = bodyParser.json();
+// const bodyParser = require("body-parser");
+// const jsonParser = bodyParser.json();
 dotenv.config();
 const DATABASE_URL = process.env.DATABASE_URL;
 const client = new pg.Client(DATABASE_URL);
-app.use(express.json());
 const APIKEY = process.env.APIKEY;
+console.log(DATABASE_URL);
+
+// middlewares
+app.use(express.json());
+app.use(errorHandler);
 
 function MoviesLibrary(title, poster_path, overview) {
   this.title = title;
@@ -125,26 +128,63 @@ let searchPageHandler = (req, res) => {
 app.get("/search", searchPageHandler);
 
 const addMovieHandler = (req, res) => {
-  let movie = req.body;
-  let sql = `INSERT INTO movies(title, poster_path,overview,comment) VALUES($1, $2, $3, $4); RETURNING *`;
+  let movie = req.bodyy;
+  console.log(movie, "data");
+  let sql = `INSERT INTO movies(title, poster_path,overview,comment) VALUES($1, $2, $3, $4) RETURNING *;`;
   let values = [movie.title, movie.poster_path, movie.overview, movie.comment];
 
   client.query(sql, values).then((data) => {
     console.log(data);
-    return res.status(201).json(data.rows);
+    // return res.status(201).json(data.rows);
+    return res.status(200).send("test");
   });
+  // .catch((err) => errorHandler(err, req, res));
 };
 
-app.post("/addMovie", jsonParser, addMovieHandler);
+app.post("/addMovie", addMovieHandler);
 
 const getMoviesHandler = (req, res) => {
-  let sql = "SELECT * FROM movies";
+  let id = req.params.id;
+  let sql = `SELECT * FROM movies WHERE id=${id};`;
   client.query(sql).then((data) => {
-    res.status(200).json(data.row);
+    res.status(200).json(data.rows);
   });
 };
 
-app.get("/getMovies", getMoviesHandler);
+app.get("/getMovies/:id", getMoviesHandler);
+
+const updateMovieCommentHandler = (req, res) => {
+  const id = req.params.id;
+  const movie = req.body;
+
+  const sql = `UPDATE movies SET comment=$1 WHERE id=${id} RETURNING *;`;
+  const values = [movie.comment];
+
+  client.query(sql, values).then((data) => {
+    return res.status(200).json(data.rows);
+  });
+  // .catch((error) => {
+  //   errorHandler(error, req, res);
+  // });
+};
+
+app.put("/updateMovieComment/:id", updateMovieCommentHandler);
+
+const deleteMovieHandler = (req, res) => {
+  console.log(req);
+  const { id } = req.params;
+  console.log(id);
+  const sql = `DELETE FROM movies WHERE id=${id};`;
+
+  client.query(sql).then(() => {
+    return res.status(204).json([]);
+  });
+  // .catch((error) => {
+  //   errorHandler(error, req, res);
+  // });
+};
+
+app.delete("/deleteMovie/:id", deleteMovieHandler);
 
 const pageNotFoundHandler = (req, res) => {
   return res.status(404).send({
@@ -155,14 +195,10 @@ const pageNotFoundHandler = (req, res) => {
 
 app.get("*", pageNotFoundHandler);
 
-// const errorHandler = (err, req, res) => {
-//   res.send({
-//     status: 500,
-//     responseText: "Something went wrong",
-//   });
-// };
-
-// app.use(errorHandler);
+function errorHandler(err, req, res, next) {
+  res.status(500).send("something went wrong");
+  // res.render("error", { error: err });
+}
 
 client.connect().then(() => {
   app.listen(3030, () => {
