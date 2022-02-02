@@ -1,3 +1,5 @@
+// testing the push
+
 const express = require("express");
 const axios = require("axios");
 const dotenv = require("dotenv");
@@ -124,8 +126,8 @@ app.get("/search", searchPageHandler);
 
 const addMovieHandler = (req, res) => {
   let movie = req.body;
-  let sql = `INSERT INTO movies(title, poster_path,overview,comment) VALUES($1, $2, $3, $4); RETURN *`;
-  let values = [movie.id, movie.poster_path, movie.overview, movie.comment];
+  let sql = `INSERT INTO movies(title, poster_path,overview,comment) VALUES($1, $2, $3, $4); RETURNING *`;
+  let values = [movie.title, movie.poster_path, movie.overview, movie.comment];
 
   client.query(sql, values).then((data) => {
     console.log(data);
@@ -137,7 +139,7 @@ app.post("/addMovie", jsonParser, addMovieHandler);
 
 const getMoviesHandler = (req, res) => {
   let sql = "SELECT * FROM movies";
-  client.query(sql).then(() => {
+  client.query(sql).then((data) => {
     res.status(200).json(data.row);
   });
 };
