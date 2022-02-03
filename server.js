@@ -28,12 +28,12 @@ function MoviesLibrary(title, poster_path, overview) {
 }
 
 let homePageHandler = (req, res) => {
-  let moviesLibray = [];
-  moviesData.data.forEach((movie) => {
-    movie = new MoviesLibrary(movie.title, movie.poster_path, movie.overview);
-    moviesLibray.push(movie);
-  });
-  return res.status(200).json(moviesLibray);
+  // let moviesLibray = [];
+  // moviesData.data.forEach((movie) => {
+  //   movie = new MoviesLibrary(movie.title, movie.poster_path, movie.overview);
+  //   moviesLibray.push(movie);
+  // });
+  return res.status(200).send("Hello World");
 };
 
 app.get("/", homePageHandler);
