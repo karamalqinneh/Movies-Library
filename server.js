@@ -15,7 +15,6 @@ const client = new pg.Client({
   ssl: { rejectUnauthorized: false },
 });
 const APIKEY = process.env.APIKEY;
-console.log(DATABASE_URL);
 
 // middlewares
 app.use(express.json());
