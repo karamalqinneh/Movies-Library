@@ -171,7 +171,6 @@ const updateMovieCommentHandler = (req, res) => {
 app.put("/updateMovieComment/:id", updateMovieCommentHandler);
 
 const deleteMovieHandler = (req, res) => {
-  console.log(req);
   const { id } = req.params;
   console.log(id);
   const sql = `DELETE FROM movies WHERE id=${id};`;
