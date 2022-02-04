@@ -7,7 +7,12 @@ const moviesData = require("./Movie-Data/data.json");
 const pg = require("pg");
 // const bodyParser = require("body-parser");
 // const jsonParser = bodyParser.json();
+
+// middlewares
+app.use(express.json());
+app.use(errorHandler);
 dotenv.config();
+
 const DATABASE_URL = process.env.DATABASE_URL;
 // const client = new pg.Client(DATABASE_URL);
 const client = new pg.Client({
@@ -16,9 +21,7 @@ const client = new pg.Client({
 });
 const APIKEY = process.env.APIKEY;
 
-// middlewares
-app.use(express.json());
-app.use(errorHandler);
+// constructor function
 
 function MoviesLibrary(title, poster_path, overview) {
   this.title = title;
@@ -26,24 +29,35 @@ function MoviesLibrary(title, poster_path, overview) {
   this.overview = overview;
 }
 
-let homePageHandler = (req, res) => {
-  // let moviesLibray = [];
-  // moviesData.data.forEach((movie) => {
-  //   movie = new MoviesLibrary(movie.title, movie.poster_path, movie.overview);
-  //   moviesLibray.push(movie);
-  // });
-  return res.status(200).send("Hello World");
-};
-
+// end points
 app.get("/", homePageHandler);
-
-let favoritePageHandler = (req, res) => {
-  return res.status(200).send("To be filled...");
-};
-
 app.get("/favorite", favoritePageHandler);
+app.get("/trending", trendingPageHandler);
+app.get("/topRated", topRatedPageHandler);
+app.get("/upcoming", upcomingPageHandler);
+app.get("/search", searchPageHandler);
+app.post("/addMovie", addMovieHandler);
+app.get("/getMovies/:id", getMoviesHandler);
+app.put("/updateMovieComment/:id", updateMovieCommentHandler);
+app.delete("/deleteMovie/:id", deleteMovieHandler);
+app.get("*", pageNotFoundHandler);
 
-let trendingPageHandler = (req, res) => {
+// endpoints handling functions
+
+function homePageHandler(req, res) {
+  let moviesLibray = [];
+  moviesData.data.forEach((movie) => {
+    movie = new MoviesLibrary(movie.title, movie.poster_path, movie.overview);
+    moviesLibray.push(movie);
+  });
+  return res.status(200).json(moviesLibray);
+}
+
+function favoritePageHandler(req, res) {
+  return res.status(200).send("To be filled...");
+}
+
+function trendingPageHandler(req, res) {
   let trendingMovies = [];
   axios
     .get(
@@ -60,11 +74,9 @@ let trendingPageHandler = (req, res) => {
       });
       return res.status(200).json(trendingMovies);
     });
-};
+}
 
-app.get("/trending", trendingPageHandler);
-
-let topRatedPageHandler = (req, res) => {
+function topRatedPageHandler(req, res) {
   let topRated = [];
   axios
     .get(
@@ -81,11 +93,9 @@ let topRatedPageHandler = (req, res) => {
       });
       return res.status(200).json(topRated);
     });
-};
+}
 
-app.get("/topRated", topRatedPageHandler);
-
-let upcomingPageHandler = (req, res) => {
+function upcomingPageHandler(req, res) {
   let upcoming = [];
   axios
     .get(
@@ -102,11 +112,9 @@ let upcomingPageHandler = (req, res) => {
       });
       return res.status(200).json(upcoming);
     });
-};
+}
 
-app.get("/upcoming", upcomingPageHandler);
-
-let searchPageHandler = (req, res) => {
+function searchPageHandler(req, res) {
   let searchQuery = req.query.search;
   console.log(req.query.search);
   let searchResults = [];
@@ -126,11 +134,9 @@ let searchPageHandler = (req, res) => {
       });
       return res.status(200).json(searchResults);
     });
-};
+}
 
-app.get("/search", searchPageHandler);
-
-const addMovieHandler = (req, res) => {
+function addMovieHandler(req, res) {
   let movie = req.bodyy;
   console.log(movie, "data");
   let sql = `INSERT INTO movies(title, poster_path,overview,comment) VALUES($1, $2, $3, $4) RETURNING *;`;
@@ -142,21 +148,17 @@ const addMovieHandler = (req, res) => {
     return res.status(200).send("test");
   });
   // .catch((err) => errorHandler(err, req, res));
-};
+}
 
-app.post("/addMovie", addMovieHandler);
-
-const getMoviesHandler = (req, res) => {
+function getMoviesHandler(req, res) {
   let id = req.params.id;
   let sql = `SELECT * FROM movies WHERE id=${id};`;
   client.query(sql).then((data) => {
     res.status(200).json(data.rows);
   });
-};
+}
 
-app.get("/getMovies/:id", getMoviesHandler);
-
-const updateMovieCommentHandler = (req, res) => {
+function updateMovieCommentHandler(req, res) {
   const id = req.params.id;
   const movie = req.body;
 
@@ -169,11 +171,9 @@ const updateMovieCommentHandler = (req, res) => {
   // .catch((error) => {
   //   errorHandler(error, req, res);
   // });
-};
+}
 
-app.put("/updateMovieComment/:id", updateMovieCommentHandler);
-
-const deleteMovieHandler = (req, res) => {
+function deleteMovieHandler(req, res) {
   const { id } = req.params;
   console.log(id);
   const sql = `DELETE FROM movies WHERE id=${id};`;
@@ -184,18 +184,14 @@ const deleteMovieHandler = (req, res) => {
   // .catch((error) => {
   //   errorHandler(error, req, res);
   // });
-};
+}
 
-app.delete("/deleteMovie/:id", deleteMovieHandler);
-
-const pageNotFoundHandler = (req, res) => {
+function pageNotFoundHandler(req, res) {
   return res.status(404).send({
     status: 404,
     responseText: "page not found",
   });
-};
-
-app.get("*", pageNotFoundHandler);
+}
 
 function errorHandler(err, req, res, next) {
   res.status(500).send("something went wrong");
