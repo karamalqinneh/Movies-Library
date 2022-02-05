@@ -20,6 +20,7 @@ const client = new pg.Client({
   ssl: { rejectUnauthorized: false },
 });
 const APIKEY = process.env.APIKEY;
+const PORT = process.env.PORT;
 
 // constructor function
 
@@ -199,7 +200,7 @@ function errorHandler(err, req, res, next) {
 }
 
 client.connect().then(() => {
-  app.listen(3030, () => {
-    console.log("listening to port 3030");
+  app.listen(PORT, () => {
+    console.log(`listening to port ${PORT}`);
   });
 });
