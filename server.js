@@ -2,7 +2,6 @@
 const express = require("express");
 const axios = require("axios");
 const dotenv = require("dotenv");
-const cors = require("cors");
 const app = express();
 const moviesData = require("./Movie-Data/data.json");
 const pg = require("pg");
@@ -12,7 +11,6 @@ const pg = require("pg");
 // middlewares
 app.use(express.json());
 app.use(errorHandler);
-app.use(cors());
 dotenv.config();
 
 const DATABASE_URL = process.env.DATABASE_URL;
