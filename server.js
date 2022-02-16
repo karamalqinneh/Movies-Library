@@ -40,7 +40,8 @@ app.get("/topRated", topRatedPageHandler);
 app.get("/upcoming", upcomingPageHandler);
 app.get("/search", searchPageHandler);
 app.post("/addMovie", addMovieHandler);
-app.get("/getMovies/:id", getMoviesHandler);
+app.get("/getMovie/:id", getMovieHandler);
+app.get("/getMovies", getMoviesHandler);
 app.put("/updateMovieComment/:id", updateMovieCommentHandler);
 app.delete("/deleteMovie/:id", deleteMovieHandler);
 app.get("*", pageNotFoundHandler);
@@ -154,6 +155,13 @@ function addMovieHandler(req, res) {
 }
 
 function getMoviesHandler(req, res) {
+  let id = req.params.id;
+  let sql = `SELECT * FROM movies;`;
+  client.query(sql).then((data) => {
+    res.status(200).json(data.rows);
+  });
+}
+function getMovieHandler(req, res) {
   let id = req.params.id;
   let sql = `SELECT * FROM movies WHERE id=${id};`;
   client.query(sql).then((data) => {
