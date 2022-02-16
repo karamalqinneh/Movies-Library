@@ -141,7 +141,7 @@ function searchPageHandler(req, res) {
 }
 
 function addMovieHandler(req, res) {
-  let movie = req.bodyy;
+  let movie = req.body;
   console.log(movie, "data");
   let sql = `INSERT INTO movies(title, poster_path,overview,comment) VALUES($1, $2, $3, $4) RETURNING *;`;
   let values = [movie.title, movie.poster_path, movie.overview, movie.comment];
