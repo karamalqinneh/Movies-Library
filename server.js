@@ -5,10 +5,12 @@ const dotenv = require("dotenv");
 const app = express();
 const moviesData = require("./Movie-Data/data.json");
 const pg = require("pg");
+const cors = require("cors");
 // const bodyParser = require("body-parser");
 // const jsonParser = bodyParser.json();
 
 // middlewares
+app.use(cors());
 app.use(express.json());
 app.use(errorHandler);
 dotenv.config();
