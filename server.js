@@ -190,7 +190,7 @@ function deleteMovieHandler(req, res) {
   const sql = `DELETE FROM movies WHERE id=${id};`;
 
   client.query(sql).then(() => {
-    return res.status(204).json([]);
+    return res.redirect("/fav");
   });
   // .catch((error) => {
   //   errorHandler(error, req, res);
